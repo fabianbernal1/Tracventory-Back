@@ -7,7 +7,7 @@ import com.ppi.trackventory.models.User;
 
 public interface UserService {
 
-    public User saveUser(User user) throws Exception;
+    public User saveUser(User user, Boolean assign) throws Exception;
 
     public User getUser(String username);
 
@@ -17,6 +17,6 @@ public interface UserService {
 
     public List<User> getAllUsers();
 
-	User updateUser(User user) throws Exception;
+	User updateUserPassword(String userId) throws Exception;
 
 }

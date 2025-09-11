@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ppi.trackventory.models.Rol;
 import com.ppi.trackventory.models.User;
+import com.ppi.trackventory.models.UserWithPasswordDTO;
 import com.ppi.trackventory.services.UserService;
 
 @RestController
@@ -30,16 +31,17 @@ public class UserController {
     private UserService userService;
     
     @PostMapping("/")
-    public User saveUser(@RequestBody User user) throws Exception{
-    	Optional<User> userData = userService.getUserById(user.getId());
-    	User userData2 = userService.getUser(user.getUsername());
+    public User saveUser(@RequestBody UserWithPasswordDTO dto) throws Exception{
+    	dto.getUser().setPassword(dto.getPassword());
+    	Optional<User> userData = userService.getUserById(dto.getUser().getId());
+    	User userData2 = userService.getUser(dto.getUser().getUsername());
     	if (userData.isPresent() ) {
     		 throw new Exception("Usuario con este documento ya existe");
     	}
     	if (userData2 !=null) {
    		 throw new Exception("Usuario con este Nombre de Usuario ya existe");
     	}
-        return userService.saveUser(user);
+        return userService.saveUser(dto.getUser(),false);
     }
     
     @PreAuthorize("hasAuthority('/users:r')")
@@ -51,23 +53,26 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('/users:u')")
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable("id") String id, @RequestBody User updatedUser) throws Exception {
+    public ResponseEntity<User> updateUser(@PathVariable("id") String id, @RequestBody UserWithPasswordDTO dto) throws Exception {
         Optional<User> userData = userService.getUserById(id);
-
+        Boolean assign= false;
         if (userData.isPresent()) {
             User user = userData.get();
-            user.setId(updatedUser.getId()); 
-            user.setUsername(updatedUser.getUsername());
-            user.setPassword(updatedUser.getPassword());
-            user.setName(updatedUser.getName());
-            user.setLastName(updatedUser.getLastName());
-            user.setSecondLastName(updatedUser.getSecondLastName());
-            user.setPhoneNumber(updatedUser.getPhoneNumber());
-            user.setDomain(updatedUser.getDomain());
-            user.setEnabled(updatedUser.isEnabled());
-            user.setProfile(updatedUser.getProfile());
+            user.setId(dto.getUser().getId()); 
+            user.setUsername(dto.getUser().getUsername());
+            user.setName(dto.getUser().getName());
+            if (dto.getPassword() != null) {
+            	user.setPassword(dto.getPassword());
+            	assign= true;
+            }
+            user.setLastName(dto.getUser().getLastName());
+            user.setSecondLastName(dto.getUser().getSecondLastName());
+            user.setPhoneNumber(dto.getUser().getPhoneNumber());
+            user.setDomain(dto.getUser().getDomain());
+            user.setEnabled(dto.getUser().isEnabled());
+            user.setProfile(dto.getUser().getProfile());
 
-            User savedUser = userService.saveUser(user);
+            User savedUser = userService.saveUser(user,assign);
             return new ResponseEntity<>(savedUser, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -75,16 +80,23 @@ public class UserController {
     }
     
     @PreAuthorize("hasAuthority('/users:r')")
-    @GetMapping("/{username}")
-    public User getUser(@PathVariable("username") String username){
-    	User user = userService.getUserById(username).orElse(null);
+    @GetMapping("/{id}")
+    public User getUserById(@PathVariable("id") String id){
+    	User user = userService.getUserById(id).orElse(null);
         return user;
     }
     
-    @PutMapping("/UpdatePassword")
+    @PreAuthorize("hasAuthority('/users:r')")
+    @GetMapping("/username/{username}")
+    public User getUserByUsername(@PathVariable("username") String username){
+    	User user = userService.getUser(username);
+        return user;
+    }
+    
+    @PutMapping("/UpdatePassword/{username}")
     public User UpdatePassword(@PathVariable("username") String username) throws Exception{
     	User user = userService.getUser(username);
-    	userService.updateUser(user);
+    	userService.updateUserPassword(user.getId());
         return user;
     }
 

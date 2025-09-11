@@ -36,13 +36,14 @@ public class UserServiceImpl implements UserService {
 	private ProfileRepository profileRepository;
 
 	@Override
-	public User saveUser(User user) throws Exception {
+	public User saveUser(User user, Boolean assign) throws Exception {
 		User newUser = null;
 		Optional<User> userLocal = userRepository.findById(user.getId());
 
 		if (userLocal.isPresent()) {
-			user.setPassword(userLocal.get().getPassword());
-
+			if(assign) {
+				assignPassword(user);
+			}
 			if (!userLocal.get().getUsername().equals(user.getUsername())) {
 				if (userRepository.findByUsername(user.getUsername()) != null) {
 					throw new Exception("Usuario con este Nombre de Usuario ya existe");
@@ -74,27 +75,6 @@ public class UserServiceImpl implements UserService {
 	}
 	
 	@Override
-	public User updateUser(User user) throws Exception {
-		User newUser = null;
-		Optional<User> userLocal = userRepository.findById(user.getId());
-		if (userLocal.isPresent()) {
-			if (user.getPassword() != null) {
-				user.setPassword(userLocal.get().getPassword());
-			} else {
-				assignPassword(user);
-			}
-			if (userLocal.get().getUsername() != user.getUsername()) {
-				if (userRepository.findByUsername(user.getUsername()) != null) {
-					throw new Exception("Usuario con este Nombre de Usuario ya existe");
-				}
-			}
-			newUser = userRepository.save(user);
-		} else {
-			throw new Exception("Usuario no encontrado");
-		}
-		return newUser;
-	}
-
 	public User updateUserPassword(String userId) throws Exception {
 		User newUser = null;
 		Optional<User> userLocal = userRepository.findById(userId);
