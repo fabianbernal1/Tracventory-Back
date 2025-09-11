@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +28,8 @@ public class PermissionController {
 
     @Autowired
     private PermissionService permissionService;
-
+    
+    @PreAuthorize("hasAuthority('/permissions:r')")
     // Obtener un permiso por su ID compuesto
     @GetMapping("/{profileId}/{formUrl}")
     public ResponseEntity<Permission> getPermissionById(@PathVariable Long profileId, @PathVariable Integer formUrl) {
@@ -36,14 +38,16 @@ public class PermissionController {
         return permission.map(p -> new ResponseEntity<>(p, HttpStatus.OK))
                          .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
-
+    
+    @PreAuthorize("hasAuthority('/permissions:c')")
     // Crear un nuevo permiso
     @PostMapping
     public ResponseEntity<Permission> createPermission(@RequestBody Permission permission) {
         Permission newPermission = permissionService.savePermission(permission);
         return new ResponseEntity<>(newPermission, HttpStatus.CREATED);
     }
-
+    
+    @PreAuthorize("hasAuthority('/permissions:d')")
     // Eliminar un permiso por su ID compuesto
     @DeleteMapping("/{profileId}/{formUrl}")
     public ResponseEntity<HttpStatus> deletePermission(@PathVariable Long profileId, @PathVariable Integer formUrl) {
@@ -57,6 +61,7 @@ public class PermissionController {
     }
 
     // Obtener permisos por perfil
+    @PreAuthorize("hasAuthority('/permissions:r')")
     @GetMapping("/profile/{profileId}")
     public ResponseEntity<List<Permission>> getPermissionsByProfile(@PathVariable Long profileId) {
         Profile profile = new Profile();

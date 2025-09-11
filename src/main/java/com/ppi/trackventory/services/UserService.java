@@ -17,4 +17,6 @@ public interface UserService {
 
     public List<User> getAllUsers();
 
+	User updateUser(User user) throws Exception;
+
 }

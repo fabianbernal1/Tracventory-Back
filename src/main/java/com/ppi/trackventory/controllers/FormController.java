@@ -56,6 +56,8 @@ public class FormController {
             form.setUrl(updatedForm.getUrl());
             form.setName(updatedForm.getName());
             form.setIcon(updatedForm.getIcon());
+            form.setParent(updatedForm.getParent());
+            form.setVisible(updatedForm.isVisible());
             formService.saveForm(form);
             return new ResponseEntity<>(form, HttpStatus.OK);
         } else {

@@ -29,9 +29,16 @@ public class UserController {
     @Autowired
     private UserService userService;
     
-    @PreAuthorize("hasAuthority('/users:c')")
     @PostMapping("/")
     public User saveUser(@RequestBody User user) throws Exception{
+    	Optional<User> userData = userService.getUserById(user.getId());
+    	User userData2 = userService.getUser(user.getUsername());
+    	if (userData.isPresent() ) {
+    		 throw new Exception("Usuario con este documento ya existe");
+    	}
+    	if (userData2 !=null) {
+   		 throw new Exception("Usuario con este Nombre de Usuario ya existe");
+    	}
         return userService.saveUser(user);
     }
     
@@ -71,6 +78,13 @@ public class UserController {
     @GetMapping("/{username}")
     public User getUser(@PathVariable("username") String username){
     	User user = userService.getUserById(username).orElse(null);
+        return user;
+    }
+    
+    @PutMapping("/UpdatePassword")
+    public User UpdatePassword(@PathVariable("username") String username) throws Exception{
+    	User user = userService.getUser(username);
+    	userService.updateUser(user);
         return user;
     }
 
