@@ -1,5 +1,7 @@
 package com.ppi.trackventory.controllers;
 
+import java.security.Principal;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -7,15 +9,18 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
+import com.ppi.trackventory.configurations.BusinessException;
 import com.ppi.trackventory.configurations.JwtUtils;
 import com.ppi.trackventory.models.JwtRequest;
 import com.ppi.trackventory.models.JwtResponse;
 import com.ppi.trackventory.models.User;
 import com.ppi.trackventory.services.impl.UserDetailsServiceImpl;
-
-import java.security.Principal;
 
 @RestController
 @CrossOrigin("*")
@@ -36,7 +41,7 @@ public class AuthenticationController {
         	authenticate(jwtRequest.getUsername(),jwtRequest.getPassword());
         }catch (Exception exception){
             exception.printStackTrace();
-            throw new Exception("User not found");
+            throw new BusinessException("User not found");
         }
 
         UserDetails userDetails =  this.userDetailsService.loadUserByUsername(jwtRequest.getUsername());

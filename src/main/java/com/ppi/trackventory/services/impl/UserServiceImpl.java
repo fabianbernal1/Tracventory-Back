@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.ppi.trackventory.configurations.BusinessException;
 import com.ppi.trackventory.models.Profile;
 import com.ppi.trackventory.models.User;
 import com.ppi.trackventory.repositories.ProfileRepository;
@@ -46,7 +47,7 @@ public class UserServiceImpl implements UserService {
 			}
 			if (!userLocal.get().getUsername().equals(user.getUsername())) {
 				if (userRepository.findByUsername(user.getUsername()) != null) {
-					throw new Exception("Usuario con este Nombre de Usuario ya existe");
+					throw new BusinessException("Usuario con este Nombre de Usuario ya existe");
 				}
 			}
 			newUser = userRepository.save(user);
@@ -84,7 +85,7 @@ public class UserServiceImpl implements UserService {
 			assignPassword(newUser);
 			newUser = userRepository.save(newUser);
 		}else {
-			throw new Exception("Usuario no encontrado");
+			throw new BusinessException("Usuario no encontrado");
 		}
 		return newUser;
 	}

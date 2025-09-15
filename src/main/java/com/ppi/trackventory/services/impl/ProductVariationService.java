@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ppi.trackventory.configurations.BusinessException;
 import com.ppi.trackventory.models.Product;
 import com.ppi.trackventory.models.ProductVariation;
 import com.ppi.trackventory.repositories.ProductVariationRepository;
@@ -35,7 +36,7 @@ public class ProductVariationService {
         if (optionalProduct.isPresent()) {
             return productVariationRepository.findByProduct(optionalProduct.get());
         } else {
-            throw new Exception("Product not found with ID: " + productId);
+            throw new BusinessException("Producto no encontrado con el id:" + productId);
         }
     }
 

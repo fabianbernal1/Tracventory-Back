@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ppi.trackventory.models.Rol;
+import com.ppi.trackventory.configurations.BusinessException;
 import com.ppi.trackventory.models.User;
 import com.ppi.trackventory.models.UserWithPasswordDTO;
 import com.ppi.trackventory.services.UserService;
@@ -36,10 +36,10 @@ public class UserController {
     	Optional<User> userData = userService.getUserById(dto.getUser().getId());
     	User userData2 = userService.getUser(dto.getUser().getUsername());
     	if (userData.isPresent() ) {
-    		 throw new Exception("Usuario con este documento ya existe");
+    		 throw new BusinessException("Usuario con este documento ya existe");
     	}
     	if (userData2 !=null) {
-   		 throw new Exception("Usuario con este Nombre de Usuario ya existe");
+   		 throw new BusinessException("Usuario con este Nombre de Usuario ya existe");
     	}
         return userService.saveUser(dto.getUser(),false);
     }

@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ppi.trackventory.configurations.BusinessException;
 import com.ppi.trackventory.models.TransactionOrigins;
 import com.ppi.trackventory.repositories.TransactionOriginsRepository;
 
@@ -17,7 +18,7 @@ public class TransactionOriginsService {
     // Guardar o actualizar un origen de transacción
     public TransactionOrigins saveTransactionOrigin(TransactionOrigins transactionOrigin) throws Exception {
         if (transactionOrigin.getName() == null || transactionOrigin.getName().isEmpty()) {
-            throw new Exception("The transaction origin name cannot be empty.");
+            throw new BusinessException("El origen de la transaccion no puede ser nula");
         }
         return transactionOriginsRepository.save(transactionOrigin);
     }
@@ -25,7 +26,7 @@ public class TransactionOriginsService {
     // Obtener un origen de transacción por ID
     public TransactionOrigins getTransactionOriginById(Integer id) throws Exception {
         return transactionOriginsRepository.findById(id)
-                .orElseThrow(() -> new Exception("Transaction origin not found with ID: " + id));
+                .orElseThrow(() -> new BusinessException("No se encontro la transaccion con el id:" + id));
     }
 
     // Obtener todos los orígenes de transacción

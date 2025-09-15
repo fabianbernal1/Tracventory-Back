@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ppi.trackventory.configurations.BusinessException;
 import com.ppi.trackventory.models.TransactionTypes;
 import com.ppi.trackventory.repositories.TransactionTypesRepository;
 
@@ -17,7 +18,7 @@ public class TransactionTypesService {
     // Guardar o actualizar un tipo de transacción
     public TransactionTypes saveTransactionType(TransactionTypes transactionType) throws Exception {
         if (transactionType.getName() == null || transactionType.getName().isEmpty()) {
-            throw new Exception("El nombre del tipo de transacción no puede estar vacío.");
+            throw new BusinessException("El nombre del tipo de transacción no puede estar vacío.");
         }
         return transactionTypesRepository.save(transactionType);
     }
@@ -25,7 +26,7 @@ public class TransactionTypesService {
     // Obtener un tipo de transacción por ID
     public TransactionTypes getTransactionTypeById(Integer id) throws Exception {
         return transactionTypesRepository.findById(id)
-                .orElseThrow(() -> new Exception("Tipo de transacción no encontrado con ID: " + id));
+                .orElseThrow(() -> new BusinessException("Tipo de transacción no encontrado con ID: " + id));
     }
 
     // Obtener todos los tipos de transacción

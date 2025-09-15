@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ppi.trackventory.configurations.BusinessException;
 import com.ppi.trackventory.models.TransactionDetails;
 import com.ppi.trackventory.models.TransactionTypes;
 import com.ppi.trackventory.models.Transactions;
@@ -38,7 +39,7 @@ public class TransactionsService {
     // Guardar o actualizar una transacción con sus detalles
     public Transactions saveTransaction(String buyer, String seller, Integer transactionType,Integer transactionOrigin, List<TransactionDetails> transactionDetails,LocalDateTime transactionDate ) throws Exception {
         if (buyer == null || seller == null || transactionType == 0 || transactionDetails == null || transactionDetails.isEmpty()) {
-            throw new Exception("Faltan datos obligatorios para registrar la transacción.");
+            throw new BusinessException("Faltan datos obligatorios para registrar la transacción.");
         }
 
         // Crear nueva transacción
@@ -95,7 +96,7 @@ public class TransactionsService {
     public List<Transactions> getTransactionsByType(Integer transactionTypeId) throws Exception {
     	TransactionTypes type = transactionTypesService.getTransactionTypeById(transactionTypeId);
     	if (type == null) {
-            throw new Exception("El tipo de transacción no puede ser nulo.");
+            throw new BusinessException("El tipo de transacción no puede ser nulo.");
         }
         return transactionsRepository.findByTransactionType(type);
     }

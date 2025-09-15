@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ppi.trackventory.configurations.BusinessException;
 import com.ppi.trackventory.models.Stock;
 import com.ppi.trackventory.models.TransactionDetails;
 import com.ppi.trackventory.models.Transactions;
@@ -22,12 +23,12 @@ public class TransactionDetailsService {
     // Guardar detalles de una transacción
     public List<TransactionDetails> saveTransactionDetails(List<TransactionDetails> details) throws Exception {
         if (details == null || details.isEmpty()) {
-            throw new Exception("No se pueden guardar detalles vacíos.");
+            throw new BusinessException("No se pueden guardar detalles vacíos.");
         }
 
         for (TransactionDetails detail : details) {
             if (detail.getStock().getQuantity() < detail.getQuantity()) {
-                throw new Exception("Stock insuficiente para completar la transacción.");
+                throw new BusinessException("Stock insuficiente para completar la transacción.");
             }
         }
 
@@ -44,7 +45,7 @@ public class TransactionDetailsService {
     // Obtener detalles por transacción
     public List<TransactionDetails> getDetailsByTransaction(Transactions transaction) throws Exception {
         if (transaction == null) {
-            throw new Exception("La transacción no puede ser nula.");
+            throw new BusinessException("La transacción no puede ser nula.");
         }
         return transactionDetailsRepository.findByTransaction(transaction);
     }

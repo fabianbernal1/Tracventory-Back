@@ -74,12 +74,7 @@ public class ProductCategoryController {
     @PreAuthorize("hasAuthority('/categories:d')")
     // Eliminar una categoría
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteCategory(@PathVariable Long id) {
-        try {
+    public void deleteCategory(@PathVariable Long id) {
             productCategoryService.deleteCategoryById(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 }

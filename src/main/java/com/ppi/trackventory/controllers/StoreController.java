@@ -74,12 +74,7 @@ public class StoreController {
     @PreAuthorize("hasAuthority('/stores:d')")
     // Eliminar una tienda
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteStore(@PathVariable Long id) {
-        try {
+    public void deleteStore(@PathVariable Long id) {
             storeService.deleteStoreById(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 }
