@@ -4,9 +4,11 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "TRANSACTION_TYPES")
+@SequenceGenerator(name = "types_seq", sequenceName = "TYPES_SEQ", allocationSize = 1)
 public class TransactionTypes {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "types_seq")
     @Column(name = "ID", length = 2)
     private Integer id;
 

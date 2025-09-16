@@ -37,7 +37,7 @@ public class TransactionsService {
     private StockService stockService;
     
     // Guardar o actualizar una transacción con sus detalles
-    public Transactions saveTransaction(String buyer, String seller, Integer transactionType,Integer transactionOrigin, List<TransactionDetails> transactionDetails,LocalDateTime transactionDate ) throws Exception {
+    public Transactions saveTransaction(String buyer, String seller, Integer transactionType,Integer transactionOrigin, List<TransactionDetails> transactionDetails,LocalDateTime transactionDate, Boolean enabled ) throws Exception {
         if (buyer == null || seller == null || transactionType == 0 || transactionDetails == null || transactionDetails.isEmpty()) {
             throw new BusinessException("Faltan datos obligatorios para registrar la transacción.");
         }
@@ -49,7 +49,7 @@ public class TransactionsService {
         transaction.setTransactionType(transactionTypesService.getTransactionTypeById(transactionType));
         transaction.setTransactionOrigin(transactionOriginsService.getTransactionOriginById(transactionOrigin));
         transaction.setDate(Date.from(transactionDate.atZone(ZoneId.systemDefault()).toInstant())); 
-        
+        transaction.setEnabled(enabled);
         // Guardar la transacción
         Transactions savedTransaction = transactionsRepository.save(transaction);
 

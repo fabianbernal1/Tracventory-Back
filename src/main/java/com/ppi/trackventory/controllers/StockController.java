@@ -84,19 +84,22 @@ public class StockController {
             return ResponseEntity.notFound().build();
         }
     }
-
+    
+    @PreAuthorize("hasAuthority('/stocks:r')")
     // Obtener stocks por tienda
     @GetMapping("/store/{storeId}")
     public List<Stock> getStockByStoreId(@PathVariable Long storeId) {
         return stockService.getStockByStoreId(storeId);
     }
-
+    
+    @PreAuthorize("hasAuthority('/stocks:r')")
     // Obtener stocks por variación de producto
     @GetMapping("/variation/{variationCode}")
     public List<Stock> getStockByVariationCode(@PathVariable String variationCode) {
         return stockService.getStockByVariationCode(variationCode);
     }
-
+    
+    @PreAuthorize("hasAuthority('/stocks:r')")
     // Generar reporte en Excel
     @GetMapping("/report")
     public ResponseEntity<byte[]> generateExcelReport() throws IOException {

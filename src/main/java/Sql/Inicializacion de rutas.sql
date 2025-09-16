@@ -47,15 +47,15 @@ VALUES (nextval('form_seq'), 'fa-store', 'Tiendas', '/stores', true,
 
 -- Transacciones hijos
 INSERT INTO public.forms (id_form, icon, name, url, visible, parent_form_id)
-VALUES (nextval('form_seq'), 'fa-shopping-cart', 'Transacciones', '/transactions', true,
+VALUES (nextval('form_seq'), 'fa-shopping-cart', 'Movimientos', '/transactions', true,
        (SELECT id_form FROM public.forms WHERE name = 'Transacciones'));
 
 INSERT INTO public.forms (id_form, icon, name, url, visible, parent_form_id)
-VALUES (nextval('form_seq'), 'fa-random', 'Orígenes de Transacción', '/transactionOrigins', true,
+VALUES (nextval('form_seq'), 'fa-random', 'Orígenes de Movimientos', '/transactionOrigins', true,
        (SELECT id_form FROM public.forms WHERE name = 'Transacciones'));
 
 INSERT INTO public.forms (id_form, icon, name, url, visible, parent_form_id)
-VALUES (nextval('form_seq'), 'fa-exchange-alt', 'Tipos de Transacción', '/transactionTypes', true,
+VALUES (nextval('form_seq'), 'fa-exchange-alt', 'Tipos de Movimientos', '/transactionTypes', true,
        (SELECT id_form FROM public.forms WHERE name = 'Transacciones'));
 
 -- Formularios no visibles en el sidebar

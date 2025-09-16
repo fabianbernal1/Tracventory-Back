@@ -39,9 +39,10 @@ public class TransactionsController {
             @RequestParam String sellerId,
             @RequestParam Integer transactionType,
             @RequestParam Integer transactionOrigin,
+            @RequestParam Boolean enabled,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime transactionDate) {
         try {
-            Transactions savedTransaction = transactionsService.saveTransaction(buyerId, sellerId, transactionType,transactionOrigin, transactionDetails,transactionDate);
+            Transactions savedTransaction = transactionsService.saveTransaction(buyerId, sellerId, transactionType,transactionOrigin, transactionDetails,transactionDate,enabled);
             return ResponseEntity.ok(savedTransaction);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
