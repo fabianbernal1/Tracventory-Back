@@ -70,12 +70,9 @@ public class TransactionTypesController {
     @PreAuthorize("hasAuthority('/transactionTypes:d')")
     // Eliminar un tipo de transacción por ID
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteTransactionType(@PathVariable Integer id) {
-        try {
+    public ResponseEntity<Object> deleteTransactionType(@PathVariable Integer id) throws Exception {
             transactionTypesService.deleteTransactionTypeById(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
+ 
 }

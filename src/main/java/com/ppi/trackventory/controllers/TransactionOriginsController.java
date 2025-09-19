@@ -73,12 +73,8 @@ public class TransactionOriginsController {
     @PreAuthorize("hasAuthority('/transactionOrigins:d')")
     // Eliminar un origen de transacción por ID
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteTransactionOrigin(@PathVariable Integer id) {
-        try {
+    public ResponseEntity<HttpStatus> deleteTransactionOrigin(@PathVariable Integer id) throws Exception {
             transactionOriginsService.deleteTransactionOriginById(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 }

@@ -67,11 +67,7 @@ public class ProfileController {
     // Eliminar un perfil por ID
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> deleteProfile(@PathVariable Long id) {
-        try {
             profileService.deleteProfileById(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 }

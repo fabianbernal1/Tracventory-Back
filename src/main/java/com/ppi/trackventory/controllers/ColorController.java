@@ -76,11 +76,7 @@ public class ColorController {
     // Eliminar un color por su nombre
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> deleteColor(@PathVariable Integer id) {
-        try {
             colorService.deleteColorById(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 }

@@ -69,11 +69,7 @@ public class FormController {
     // Eliminar un formulario por su URL
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> deleteForm(@PathVariable Integer id) {
-        try {
             formService.deleteFormById(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 }

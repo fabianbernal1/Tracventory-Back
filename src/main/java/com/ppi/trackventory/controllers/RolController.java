@@ -66,11 +66,7 @@ public class RolController {
     // Eliminar un rol por su ID
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> deleteRol(@PathVariable Long id) {
-        try {
             rolService.deleteRolById(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 }
