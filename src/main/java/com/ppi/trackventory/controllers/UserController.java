@@ -68,7 +68,7 @@ public class UserController {
             user.setLastName(dto.getUser().getLastName());
             user.setSecondLastName(dto.getUser().getSecondLastName());
             user.setPhoneNumber(dto.getUser().getPhoneNumber());
-            user.setDomain(dto.getUser().getDomain());
+            user.setEmail(dto.getUser().getEmail());
             user.setEnabled(dto.getUser().isEnabled());
             user.setProfile(dto.getUser().getProfile());
 

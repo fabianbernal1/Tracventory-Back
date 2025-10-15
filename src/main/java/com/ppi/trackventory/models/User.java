@@ -43,8 +43,8 @@ public class User implements UserDetails {
     @Column(name = "PHONE_NUMBER", length = 15)
     private String phoneNumber;
 
-    @Column(name = "DOMAIN", length = 50)
-    private String domain;
+    @Column(name = "EMAIL", length = 50)
+    private String email;
 
     @Column(name = "ENABLED")
     private boolean enabled;
@@ -57,13 +57,13 @@ public class User implements UserDetails {
 
     }
 
-    public User(String id, String username, String password, String name, String lastName, String domain, boolean enabled) {
+    public User(String id, String username, String password, String name, String lastName, String email, boolean enabled) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.name = name;
         this.lastName = lastName;
-        this.domain = domain;
+        this.email = email;
         this.enabled = enabled;
     }
 
@@ -132,12 +132,12 @@ public class User implements UserDetails {
         this.lastName = lastName;
     }
 
-    public String getDomain() {
-        return domain;
+    public String getEmail() {
+        return email;
     }
 
-    public void setDomain(String domain) {
-        this.domain = domain;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public boolean isEnabled() {

@@ -124,7 +124,7 @@ public class UserServiceImpl implements UserService {
 
 			// Enviar correo
 			try {
-				emailService.sendHtmlEmail(user.getUsername() + "@" + user.getDomain(),
+				emailService.sendHtmlEmail(user.getEmail(),
 						"Credenciales de acceso a Trackventory", htmlContent);
 			} catch (Exception e) {
 				e.printStackTrace(); // Aquí podrías usar log.error
