@@ -24,7 +24,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleGeneralException(Exception ex) {
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Ocurrió un error inesperado. Contacte al administrador.");
+                .body("Ocurrió un error inesperado. Contacte al administrador." + ex.getMessage());
     }
     
     @ExceptionHandler(BusinessException.class)
