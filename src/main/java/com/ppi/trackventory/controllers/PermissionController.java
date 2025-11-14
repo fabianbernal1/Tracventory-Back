@@ -29,7 +29,6 @@ public class PermissionController {
     @Autowired
     private PermissionService permissionService;
     
-    @PreAuthorize("hasAuthority('/permissions:r')")
     // Obtener un permiso por su ID compuesto
     @GetMapping("/{profileId}/{formUrl}")
     public ResponseEntity<Permission> getPermissionById(@PathVariable Long profileId, @PathVariable Integer formUrl) {
@@ -60,8 +59,7 @@ public class PermissionController {
         }
     }
 
-    // Obtener permisos por perfil
-    @PreAuthorize("hasAuthority('/permissions:r')")
+
     @GetMapping("/profile/{profileId}")
     public ResponseEntity<List<Permission>> getPermissionsByProfile(@PathVariable Long profileId) {
         Profile profile = new Profile();
