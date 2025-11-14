@@ -31,7 +31,7 @@ public class UserController {
     private UserService userService;
     
     @PostMapping("/")
-    public User saveUser(@RequestBody UserWithPasswordDTO dto) throws Exception{
+    public UserWithPasswordDTO saveUser(@RequestBody UserWithPasswordDTO dto) throws Exception{
     	dto.getUser().setPassword(dto.getPassword());
     	Optional<User> userData = userService.getUserById(dto.getUser().getId());
     	User userData2 = userService.getUser(dto.getUser().getUsername());
@@ -53,7 +53,7 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('/users:u')")
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable("id") String id, @RequestBody UserWithPasswordDTO dto) throws Exception {
+    public ResponseEntity<UserWithPasswordDTO> updateUser(@PathVariable("id") String id, @RequestBody UserWithPasswordDTO dto) throws Exception {
         Optional<User> userData = userService.getUserById(id);
         Boolean assign= false;
         if (userData.isPresent()) {
@@ -72,7 +72,7 @@ public class UserController {
             user.setEnabled(dto.getUser().isEnabled());
             user.setProfile(dto.getUser().getProfile());
 
-            User savedUser = userService.saveUser(user,assign);
+            UserWithPasswordDTO savedUser = userService.saveUser(user,assign);
             return new ResponseEntity<>(savedUser, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

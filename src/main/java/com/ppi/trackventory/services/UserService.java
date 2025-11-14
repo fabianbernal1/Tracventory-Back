@@ -4,10 +4,11 @@ import java.util.List;
 import java.util.Optional;
 
 import com.ppi.trackventory.models.User;
+import com.ppi.trackventory.models.UserWithPasswordDTO;
 
 public interface UserService {
 
-    public User saveUser(User user, Boolean assign) throws Exception;
+    public UserWithPasswordDTO saveUser(User user, Boolean assign) throws Exception;
 
     public User getUser(String username);
 
@@ -17,6 +18,6 @@ public interface UserService {
 
     public List<User> getAllUsers();
 
-	User updateUserPassword(String userId) throws Exception;
+	UserWithPasswordDTO updateUserPassword(String userId) throws Exception;
 
 }

@@ -3,8 +3,15 @@ package com.ppi.trackventory.models;
 public class UserWithPasswordDTO {
     private User user;
     private String password;
+    
+    
 
-    // Getters y Setters
+    public UserWithPasswordDTO(User user, String password) {
+		super();
+		this.user = user;
+		this.password = password;
+	}
+	// Getters y Setters
     public User getUser() {
         return user;
     }
