@@ -20,7 +20,7 @@ public class FormController {
     @Autowired
     private FormService formService;
     
-    @PreAuthorize("hasAuthority('/forms:r')")
+
     // Obtener todos los formularios
     @GetMapping
     public ResponseEntity<List<Form>> getAllForms() {
@@ -28,7 +28,7 @@ public class FormController {
         return new ResponseEntity<>(forms, HttpStatus.OK);
     }
     
-    @PreAuthorize("hasAuthority('/forms:r')")
+
     // Obtener un formulario por su URL
     @GetMapping("/{id}")
     public ResponseEntity<Form> getFormByUrl(@PathVariable Integer id) {
