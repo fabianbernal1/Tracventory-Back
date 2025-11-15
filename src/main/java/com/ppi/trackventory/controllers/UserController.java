@@ -86,7 +86,6 @@ public class UserController {
         return user;
     }
     
-    @PreAuthorize("hasAuthority('/users:r')")
     @GetMapping("/username/{username}")
     public User getUserByUsername(@PathVariable("username") String username){
     	User user = userService.getUser(username);
