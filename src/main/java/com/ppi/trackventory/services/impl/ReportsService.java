@@ -10,9 +10,11 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ppi.trackventory.models.Stock;
+import com.ppi.trackventory.models.TransactionDetails;
 import com.ppi.trackventory.models.Transactions;
 
 @Service
@@ -45,17 +47,20 @@ public class ReportsService {
         }
     }
     
- // 📌 NUEVO MÉTODO PARA REPORTE DE TRANSACCIONES
+    @Autowired
+    private TransactionDetailsService transactionDetailsService;
+
     public byte[] generateReportTransactions(List<Transactions> transactions) throws IOException {
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 
             Sheet sheet = workbook.createSheet("Reporte Transacciones");
 
-            // 👉 Encabezados de la tabla
+            // 👉 Encabezados de la transacción
             Row header = sheet.createRow(0);
             String[] headers = {
-                "ID", "Fecha", "Comprador", "Vendedor",
-                "Tipo de Transacción", "Origen", "Estado"
+                    "ID", "Fecha", "Comprador", "Vendedor",
+                    "Tipo de Transacción", "Origen", "Estado",
+                    "Producto", "Color", "Tienda", "Cantidad", "Descuento %", "Total Detalle"
             };
 
             for (int i = 0; i < headers.length; i++) {
@@ -63,30 +68,36 @@ public class ReportsService {
                 cell.setCellValue(headers[i]);
             }
 
-            // 👉 Rellenar filas
             int rowIdx = 1;
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
             for (Transactions t : transactions) {
-                Row row = sheet.createRow(rowIdx++);
 
-                row.createCell(0).setCellValue(t.getId());
-                row.createCell(1).setCellValue(t.getDate() != null ? sdf.format(t.getDate()) : "N/A");
-                row.createCell(2).setCellValue(
-                        t.getBuyer() != null ? (t.getBuyer().getName() + " " + t.getBuyer().getLastName()) : "N/A"
-                );
-                row.createCell(3).setCellValue(
-                        t.getSeller() != null ? (t.getSeller().getName() + " " + t.getSeller().getLastName()) : "N/A"
-                );
-                row.createCell(4).setCellValue(
-                        t.getTransactionType() != null ? t.getTransactionType().getName() : "N/A"
-                );
-                row.createCell(5).setCellValue(
-                        t.getTransactionOrigin() != null ? t.getTransactionOrigin().getName() : "N/A"
-                );
-                row.createCell(6).setCellValue(
-                        t.getEnabled() != null && t.getEnabled() ? "Activa" : "Inactiva"
-                );
+                // 📌 Obtener los detalles de la transacción
+                List<TransactionDetails> details = transactionDetailsService.getDetailsByTransaction(t);
+
+                if (details == null || details.isEmpty()) {
+                    // Si no hay detalles, igual se imprime la fila base
+                    Row row = sheet.createRow(rowIdx++);
+                    fillTransactionColumns(row, t, sdf);
+
+                } else {
+                    // Si hay detalles, se imprime una fila por cada uno
+                    for (TransactionDetails det : details) {
+                        Row row = sheet.createRow(rowIdx++);
+                        
+                        // 🧾 columnas de la transacción
+                        fillTransactionColumns(row, t, sdf);
+
+                        // 🧾 columnas de detalle
+                        row.createCell(7).setCellValue(det.getStock().getId().getVariation().getProduct().getName());
+                        row.createCell(8).setCellValue(det.getStock().getId().getVariation().getColor().getName());
+                        row.createCell(9).setCellValue(det.getStock().getId().getStore().getName());
+                        row.createCell(10).setCellValue(det.getQuantity());
+                        row.createCell(11).setCellValue(det.getDiscount_percentage());
+                        row.createCell(12).setCellValue(det.getTotal() != null ? det.getTotal().doubleValue() : 0);
+                    }
+                }
             }
 
             // Ajustar ancho automático
@@ -96,7 +107,21 @@ public class ReportsService {
 
             workbook.write(out);
             return out.toByteArray();
+        } catch (Exception e) {
+            throw new IOException("Error generando reporte: " + e.getMessage(), e);
         }
     }
+
+    // Método auxiliar para no repetir código
+    private void fillTransactionColumns(Row row, Transactions t, SimpleDateFormat sdf) {
+        row.createCell(0).setCellValue(t.getId());
+        row.createCell(1).setCellValue(t.getDate() != null ? sdf.format(t.getDate()) : "N/A");
+        row.createCell(2).setCellValue(t.getBuyer() != null ? (t.getBuyer().getName() + " " + t.getBuyer().getLastName()) : "N/A");
+        row.createCell(3).setCellValue(t.getSeller() != null ? (t.getSeller().getName() + " " + t.getSeller().getLastName()) : "N/A");
+        row.createCell(4).setCellValue(t.getTransactionType() != null ? t.getTransactionType().getName() : "N/A");
+        row.createCell(5).setCellValue(t.getTransactionOrigin() != null ? t.getTransactionOrigin().getName() : "N/A");
+        row.createCell(6).setCellValue(t.getEnabled() != null && t.getEnabled() ? "Activa" : "Inactiva");
+    }
+
 }
 
