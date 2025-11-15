@@ -1,5 +1,7 @@
 package com.ppi.trackventory.services.impl;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -18,26 +20,26 @@ import com.ppi.trackventory.repositories.TransactionsRepository;
 @Service
 public class TransactionsService {
 
-    @Autowired
-    private TransactionsRepository transactionsRepository;
+	@Autowired
+	private TransactionsRepository transactionsRepository;
 
-    @Autowired
-    private TransactionDetailsRepository transactionDetailRepository;
-    
-    @Autowired
-    private TransactionTypesService transactionTypesService;
-    
-    @Autowired
-    private TransactionOriginsService transactionOriginsService;
-    
-    @Autowired
-    private UserServiceImpl userService;
-    
-    @Autowired
-    private StockService stockService;
-    
-    // Guardar o actualizar una transacción con sus detalles
-    public Transactions saveTransaction(String buyer, String seller, Integer transactionType,Integer transactionOrigin, List<TransactionDetails> transactionDetails,LocalDateTime transactionDate, Boolean enabled ) throws Exception {
+	@Autowired
+	private TransactionDetailsRepository transactionDetailRepository;
+
+	@Autowired
+	private TransactionTypesService transactionTypesService;
+
+	@Autowired
+	private TransactionOriginsService transactionOriginsService;
+
+	@Autowired
+	private UserServiceImpl userService;
+
+	@Autowired
+	private StockService stockService;
+
+	// Guardar o actualizar una transacción con sus detalles
+	public Transactions saveTransaction(String buyer, String seller, Integer transactionType,Integer transactionOrigin, List<TransactionDetails> transactionDetails,LocalDateTime transactionDate, Boolean enabled ) throws Exception {
         if (buyer == null || seller == null || transactionType == 0 || transactionDetails == null || transactionDetails.isEmpty()) {
             throw new BusinessException("Faltan datos obligatorios para registrar la transacción.");
         }
@@ -74,74 +76,91 @@ public class TransactionsService {
         // Guardar la transacción
         Transactions savedTransaction = transactionsRepository.save(transaction);
 
-        // Guardar los detalles de la transacción
         if (savedTransaction != null) {
             for (TransactionDetails detail : transactionDetails) {
-                detail.setTransaction(savedTransaction);
-                detail.setId(null); 
-                
-                detail = transactionDetailRepository.save(detail);
-                
-                if (detail != null) {
-                	switch ( transaction.getTransactionType().getId()) {
-                    case 1:
-                    	detail.getStock().setQuantity(detail.getStock().getQuantity()-detail.getQuantity());
-                    	stockService.saveStock(detail.getStock());
-                        break;
-                    case 2:
-                    	detail.getStock().setQuantity(detail.getStock().getQuantity()+detail.getQuantity());
-                    	stockService.saveStock(detail.getStock());
-                        break;
-                    case 3:
-                    	detail.getStock().setQuantity(detail.getStock().getQuantity()-detail.getQuantity());
-                    	stockService.saveStock(detail.getStock());
-                        break;
-                    case 4:
-                    	detail.getStock().setQuantity(detail.getStock().getQuantity()+detail.getQuantity());
-                    	stockService.saveStock(detail.getStock());
-                        break;
+
+                // Validar descuento
+                if (detail.getDiscount_percentage() < 0 || detail.getDiscount_percentage() > 100) {
+                    throw new BusinessException("El porcentaje de descuento debe estar entre 0 y 100.");
                 }
+
+                // Calcular total con descuento
+                BigDecimal precioVenta = detail.getStock().getId().getVariation().getProduct().getSalePrice();
+                BigDecimal cantidadBD = BigDecimal.valueOf(detail.getQuantity());
+                BigDecimal descuentoBD = BigDecimal.valueOf(detail.getDiscount_percentage());
+
+                // subtotal = precioVenta * cantidad
+                BigDecimal subtotal = precioVenta.multiply(cantidadBD);
+
+                // descuentoAplicado = subtotal * (descuento / 100)
+                BigDecimal descuentoAplicado = subtotal.multiply(descuentoBD).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+
+                // total = subtotal - descuentoAplicado
+                BigDecimal totalCalculado = subtotal.subtract(descuentoAplicado);
+
+                // Guardar el total
+                detail.setTotal(totalCalculado);
+
+
+                detail.setTransaction(savedTransaction);
+                detail.setId(null);
+
+                detail = transactionDetailRepository.save(detail);
+
+                if (detail != null) {
+                    switch (type.getId()) {
+                        case 1: case 3: // VENDE / DEVOLUCIÓN PROVEEDOR
+                            detail.getStock().setQuantity(detail.getStock().getQuantity() - detail.getQuantity());
+                            stockService.saveStock(detail.getStock());
+                            break;
+                        case 2: case 4: // COMPRA / DEVOLUCIÓN CLIENTE
+                            detail.getStock().setQuantity(detail.getStock().getQuantity() + detail.getQuantity());
+                            stockService.saveStock(detail.getStock());
+                            break;
+                    }
                 }
             }
         }
+            
 
         return savedTransaction;
     }
 
-    // Obtener una transacción por ID
-    public Transactions getTransactionById(Long id) throws Exception {
-        return transactionsRepository.findById(id)
-                .orElseThrow(() -> new Exception("Transacción no encontrada con el ID: " + id));
-    }
-    // Obtener transacciones por tipo
-    public List<Transactions> getTransactionsByType(Integer transactionTypeId) throws Exception {
-    	TransactionTypes type = transactionTypesService.getTransactionTypeById(transactionTypeId);
-    	if (type == null) {
-            throw new BusinessException("El tipo de transacción no puede ser nulo.");
-        }
-        return transactionsRepository.findByTransactionType(type);
-    }
+	// Obtener una transacción por ID
+	public Transactions getTransactionById(Long id) throws Exception {
+		return transactionsRepository.findById(id)
+				.orElseThrow(() -> new Exception("Transacción no encontrada con el ID: " + id));
+	}
 
-    // Obtener los detalles de una transacción específica
-    public List<TransactionDetails> getTransactionDetailsByTransaction(Transactions transaction) {
-        return transactionDetailRepository.findByTransaction(transaction);
-    }
+	// Obtener transacciones por tipo
+	public List<Transactions> getTransactionsByType(Integer transactionTypeId) throws Exception {
+		TransactionTypes type = transactionTypesService.getTransactionTypeById(transactionTypeId);
+		if (type == null) {
+			throw new BusinessException("El tipo de transacción no puede ser nulo.");
+		}
+		return transactionsRepository.findByTransactionType(type);
+	}
 
-    // Obtener todas las transacciones
-    public List<Transactions> getAllTransactions() {
-        return transactionsRepository.findAll();
-    }
+	// Obtener los detalles de una transacción específica
+	public List<TransactionDetails> getTransactionDetailsByTransaction(Transactions transaction) {
+		return transactionDetailRepository.findByTransaction(transaction);
+	}
 
-    // Eliminar una transacción por ID (y también sus detalles)
-    public void deleteTransactionById(Long id) throws Exception {
-        Transactions transaction = getTransactionById(id);
-        List<TransactionDetails> details = getTransactionDetailsByTransaction(transaction);
+	// Obtener todas las transacciones
+	public List<Transactions> getAllTransactions() {
+		return transactionsRepository.findAll();
+	}
 
-        // Eliminar los detalles de la transacción antes de eliminar la transacción
-        if (!details.isEmpty()) {
-            transactionDetailRepository.deleteAll(details);
-        }
-        
-        transactionsRepository.delete(transaction);
-    }
+	// Eliminar una transacción por ID (y también sus detalles)
+	public void deleteTransactionById(Long id) throws Exception {
+		Transactions transaction = getTransactionById(id);
+		List<TransactionDetails> details = getTransactionDetailsByTransaction(transaction);
+
+		// Eliminar los detalles de la transacción antes de eliminar la transacción
+		if (!details.isEmpty()) {
+			transactionDetailRepository.deleteAll(details);
+		}
+
+		transactionsRepository.delete(transaction);
+	}
 }
