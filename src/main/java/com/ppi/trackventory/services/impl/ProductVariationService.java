@@ -42,6 +42,9 @@ public class ProductVariationService {
 
     // Create a new product variation
     public ProductVariation createProductVariation(ProductVariation productVariation) {
+    	if(getProductVariationById(productVariation.getVariationId()).isPresent()) {
+    		throw new BusinessException("El Codigo de la variacion ya existe");
+    	}
         return productVariationRepository.save(productVariation);
     }
 

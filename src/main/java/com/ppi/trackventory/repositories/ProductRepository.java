@@ -14,7 +14,7 @@ public interface ProductRepository extends JpaRepository<Product, String> {
 
     @Query("SELECT p FROM Product p WHERE " +
            "(:productId IS NULL OR p.productId = :productId) AND " +
-           "(:name IS NULL OR p.name = :name) AND " +
+           "(:name IS NULL OR p.name LIKE %:name%) AND " +
            "(:purchasePrice IS NULL OR p.purchasePrice = :purchasePrice) AND " +
            "(:salePrice IS NULL OR p.salePrice = :salePrice) AND " +
            "(:categoryId IS NULL OR p.category.id = :categoryId)")

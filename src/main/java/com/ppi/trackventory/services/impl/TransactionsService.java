@@ -41,6 +41,27 @@ public class TransactionsService {
         if (buyer == null || seller == null || transactionType == 0 || transactionDetails == null || transactionDetails.isEmpty()) {
             throw new BusinessException("Faltan datos obligatorios para registrar la transacción.");
         }
+     // Obtener el tipo de transacción una sola vez
+        TransactionTypes type = transactionTypesService.getTransactionTypeById(transactionType);
+        if (type == null) {
+            throw new BusinessException("El tipo de transacción es inválido.");
+        }
+
+        // 🔍 VALIDACIÓN ANTES DE GUARDAR
+        if (type.getId() == 1 || type.getId() == 3) { // 1: Venta, 3: Devolución a proveedor
+            for (TransactionDetails detail : transactionDetails) {
+                int stockActual = detail.getStock().getQuantity();
+                int solicitado = detail.getQuantity();
+
+                if (solicitado > stockActual) {
+                    throw new BusinessException(
+                        "Stock insuficiente para el producto '" 
+                        + detail.getStock().getId().getVariation().getProduct().getName() + 
+                        "'. Disponible: " + stockActual + ", Solicitado: " + solicitado
+                    );
+                }
+            }
+        }
 
         // Crear nueva transacción
         Transactions transaction = new Transactions();
