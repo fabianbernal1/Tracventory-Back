@@ -52,7 +52,7 @@ public class MySecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf()
                 .disable()
                 .cors()
-                .disable()
+                .and()
                 .authorizeHttpRequests()
                 .antMatchers("/generate-token","/users/","/users/UpdatePassword/{username}").permitAll()
                 .antMatchers(HttpMethod.OPTIONS).permitAll()
@@ -64,4 +64,20 @@ public class MySecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
     }
+    @Bean
+    public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
+        org.springframework.web.cors.CorsConfiguration config = new org.springframework.web.cors.CorsConfiguration();
+
+        config.setAllowCredentials(true);
+        config.addAllowedOriginPattern("https://trackventory-front.onrender.com");
+        config.addAllowedOriginPattern("http://localhost:4200"); // opcional para desarrollo
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
+        config.addExposedHeader("*");
+
+        org.springframework.web.cors.UrlBasedCorsConfigurationSource source = new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
+
 }
